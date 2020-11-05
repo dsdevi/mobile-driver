@@ -85,10 +85,12 @@ const DynamicMap = (props) => {
 
   return (
     <View style={styles.centered}>
-      <Text>Tracking Test</Text>
-      <Button title="Start Tracking" onPress={watchLocation} />
+      <Text style={styles.text}>Tracking Test</Text>
+      <View style={styles.buttonContainer}>
+      <Button title="Start Tracking" onPress={watchLocation} color='green' />
+      </View>
       {!!distance && (
-        <Text>Distance to danger zone: {distance.toFixed(2)} meters</Text>
+        <Text style={styles.text}>Distance to danger zone: {distance.toFixed(2)} meters</Text>
       )}
     </View>
   );
@@ -100,6 +102,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  text: {
+      fontSize:22
+  },
+  buttonContainer:{
+      marginVertical:15
+  }
 });
 
 export default DynamicMap;
