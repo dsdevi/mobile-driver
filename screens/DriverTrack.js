@@ -34,7 +34,7 @@ const DriverTrack = (props) => {
 
             if (status === "WARNING") {
               setNearDanger(true);
-              Speech.speak('Approaching Danger Zone')
+              Speech.speak("Approaching Danger Zone");
             } else {
               setNearDanger(false);
             }
@@ -117,6 +117,10 @@ const DriverTrack = (props) => {
       ) : null}
     </View>
   );
+};
+
+DriverTrack.navigationOptions = {
+  headerTitle: "Tracking",
 };
 
 const styles = StyleSheet.create({
