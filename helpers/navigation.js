@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import { createSwitchNavigator, createAppContainer } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 import { Ionicons } from "@expo/vector-icons";
@@ -50,7 +50,7 @@ const HomeNav = createStackNavigator(
     defaultNavigationOptions: defaultNavOptions,
     navigationOptions: {
       tabBarLabel: "Home",
-      tabBarIcon: () => <Ionicons name="md-home" size={30} />
+      tabBarIcon: () => <Ionicons name="md-home" size={30} />,
     },
   }
 );
@@ -58,12 +58,13 @@ const HomeNav = createStackNavigator(
 const VehicleNav = createStackNavigator(
   {
     VehicleList: VehicleList,
+    VehicleAdd: VehicleAdd,
   },
   {
     defaultNavigationOptions: defaultNavOptions,
     navigationOptions: {
       tabBarLabel: "Vehicles",
-      tabBarIcon: () => <Ionicons name="md-car" size={30} />
+      tabBarIcon: () => <Ionicons name="md-car" size={30} />,
     },
   }
 );
@@ -76,7 +77,7 @@ const TrackNav = createStackNavigator(
     defaultNavigationOptions: defaultNavOptions,
     navigationOptions: {
       tabBarLabel: "Tracking",
-      tabBarIcon: () => <Ionicons name="md-locate" size={30} />
+      tabBarIcon: () => <Ionicons name="md-locate" size={30} />,
     },
   }
 );

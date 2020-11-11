@@ -1,16 +1,40 @@
 import React from "react";
 import { View, Text, StyleSheet, Alert } from "react-native";
+import { Button, Card } from "react-native-elements";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import { useDispatch, useSelector } from "react-redux";
+
+import { Ionicons } from "@expo/vector-icons";
 import CustomHeaderButton from "../components/CustomHeaderButton";
 
 import * as driverActions from "../helpers/driver-actions";
 
 const HomeScreen = (props) => {
+  const selectedVehicle = useSelector((state) => state.vehicle.selectedVehicle);
+
   return (
-    <View>
-      <Text>The Home Screen!</Text>
-    </View>
+    <Card>
+      <Text style={styles.tutorialText}>Welcome!</Text>
+      <Card.Divider />
+      <Text style={styles.tutorialText}>
+        To start tracking, first select a vehicle on the{" "}
+        <Ionicons name="md-car" size={18} />{" "}
+        <Text style={styles.boldText}>Vehicles</Text> screen by tapping the
+        registration number
+      </Text>
+      <View style={{ marginVertical: 10 }}>
+        <Text style={styles.tutorialText}>
+          When you are near an entrance press the{" "}
+          <Text style={styles.boldText}>Begin Tracking</Text> button on the
+          {"\n"}
+          <Ionicons name="md-locate" size={18} />{" "}
+          <Text style={styles.boldText}>Tracking</Text> Screen
+        </Text>
+      </View>
+      <Text style={{ ...styles.tutorialText, ...styles.boldText }}>
+        You must be near a highway entrance to start tracking!
+      </Text>
+    </Card>
   );
 };
 
@@ -20,13 +44,13 @@ HomeScreen.navigationOptions = (navData) => {
       const token = useSelector((state) => state.driver.token);
       const dispatch = useDispatch();
       const logout = async () => {
-          try {
-              await dispatch(driverActions.logOut(token))
-              navData.navigation.navigate('LoginNav')
-          } catch (err) {
-              console.log("Error in Home Screen Driver Log Out")
-              console.log(err);
-          }
+        try {
+          await dispatch(driverActions.logOut(token));
+          navData.navigation.navigate("LoginNav");
+        } catch (err) {
+          console.log("Error in Home Screen Driver Log Out");
+          console.log(err);
+        }
       };
       return (
         <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
@@ -46,6 +70,14 @@ HomeScreen.navigationOptions = (navData) => {
   };
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  tutorialText: {
+    fontFamily: "WorkSans_400Regular",
+    fontSize: 18,
+  },
+  boldText: {
+    fontFamily: "WorkSans_600SemiBold",
+  },
+});
 
 export default HomeScreen;

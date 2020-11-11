@@ -4,10 +4,11 @@ import * as Permissions from "expo-permissions";
 import * as Speech from "expo-speech";
 import * as Location from "expo-location";
 import * as driverActions from "../helpers/driver-actions";
-import { useDispatch } from "react-redux";
-import { startDetecting } from "react-native/Libraries/Utilities/PixelRatio";
+import { useDispatch, useSelector } from "react-redux";
 
 const DriverTrack = (props) => {
+  const selectedVehicle = useSelector((state) => state.vehicle.selectedVehicle);
+
   const [nearDanger, setNearDanger] = useState(false);
   const [startedTracking, setStartedTracking] = useState(false);
   const [entrance, setEntrance] = useState();
@@ -71,6 +72,22 @@ const DriverTrack = (props) => {
   const beginTracking = async () => {
     verifyPermissions();
 
+    if (!selectedVehicle) {
+      Alert.alert(
+        "Missing Vehicle!",
+        "You must select a vehicle to start tracking!",
+        [
+          {
+            text: "Okay",
+            onPress: () => {
+              props.navigation.navigate("VehicleNav");
+            },
+          },
+        ]
+      );
+      return;
+    }
+
     try {
       const location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
@@ -83,7 +100,7 @@ const DriverTrack = (props) => {
       );
 
       if (data === "INVALID") {
-        Alert.alert("SORRY", "You are not near an entrance!", [
+        Alert.alert("Sorry", "You are not near an entrance!", [
           { text: "Okay" },
         ]);
         return;
