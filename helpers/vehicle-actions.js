@@ -4,6 +4,7 @@ export const VEHICLE_ADD = "VEHICLE_ADD";
 export const VEHICLE_GET = "VEHICLE_GET";
 export const VEHICLE_SELECT = "VEHICLE_SELECT";
 export const VEHICLE_DELETE = "VEHICLE_DELETE";
+export const VEHICLE_RESET = "VEHICLE_RESET";
 
 export const vehicleAdd = (token, regNo, type, yom) => {
   return async (dispatch) => {
@@ -48,7 +49,6 @@ export const vehicleGet = (token) => {
     }
 
     const resData = await response.json();
-    console.log(resData);
 
     if (!resData.success) {
       throw new Error(resData.message);
@@ -69,6 +69,10 @@ export const vehicleGet = (token) => {
 
 export const vehicleSelect = (regNo) => {
   return { type: VEHICLE_SELECT, regNo: regNo };
+};
+
+export const vehicleReset = () => {
+  return { type: VEHICLE_RESET };
 };
 
 export const vehicleDelete = (token, regNo) => {

@@ -8,6 +8,7 @@ import { Ionicons } from "@expo/vector-icons";
 import CustomHeaderButton from "../components/CustomHeaderButton";
 
 import * as driverActions from "../helpers/driver-actions";
+import * as vehicleActions from "../helpers/vehicle-actions"
 
 const HomeScreen = (props) => {
   const selectedVehicle = useSelector((state) => state.vehicle.selectedVehicle);
@@ -45,6 +46,7 @@ HomeScreen.navigationOptions = (navData) => {
       const dispatch = useDispatch();
       const logout = async () => {
         try {
+          dispatch(vehicleActions.vehicleReset());
           await dispatch(driverActions.logOut(token));
           navData.navigation.navigate("LoginNav");
         } catch (err) {

@@ -1,4 +1,10 @@
-import { VEHICLE_ADD, VEHICLE_DELETE, VEHICLE_GET, VEHICLE_SELECT } from "./vehicle-actions";
+import {
+  VEHICLE_ADD,
+  VEHICLE_DELETE,
+  VEHICLE_GET,
+  VEHICLE_RESET,
+  VEHICLE_SELECT,
+} from "./vehicle-actions";
 
 const initialState = {
   selectedVehicle: "",
@@ -23,6 +29,8 @@ export default (state = initialState, action) => {
         (item) => item.regNo !== action.regNo
       );
       return { ...state, details: filteredDetails };
+    case VEHICLE_RESET:
+      return { details: [], selectedVehicle: "" };
   }
 
   return state;
