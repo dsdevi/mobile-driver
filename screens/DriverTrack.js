@@ -5,51 +5,126 @@ import * as Speech from "expo-speech";
 import * as Location from "expo-location";
 import * as driverActions from "../helpers/driver-actions";
 import { useDispatch, useSelector } from "react-redux";
+import haversine from "haversine";
 
 const DriverTrack = (props) => {
-  const selectedVehicle = useSelector((state) => state.vehicle.selectedVehicle);
+  const { token, username, selectedVehicle } = useSelector((state) => {
+    return {
+      token: state.driver.token,
+      username: state.driver.username,
+      selectedVehicle: state.vehicle.selectedVehicle,
+    };
+  });
 
+  // const [userLocation, setUserLocation] = useState(null);
+  // const [userWarned, setUserWarned] = useState(false);
+  const [locationWatcher, setLocationWatcher] = useState(null);
+  const [weatherRecheckLocation, setWeatherRecheckLocation] = useState(null);
   const [nearDanger, setNearDanger] = useState(false);
-  const [startedTracking, setStartedTracking] = useState(false);
+  const [isTracking, setIsTracking] = useState(false);
   const [entrance, setEntrance] = useState();
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (startedTracking) {
-      const locationWatcher = Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.Highest,
-          timeInterval: 100,
-          distanceInterval: 1,
-        },
-        async (location) => {
-          try {
-            const status = await dispatch(
-              driverActions.warnDriver(
-                location.coords.latitude,
-                location.coords.longitude
-              )
-            );
+  // useEffect(() => {
+  //   if (!userWarned && nearDanger) {
+  //     warnUser();
+  //   }
+  // }, [nearDanger]);
 
-            console.log(status);
-
-            if (status === "WARNING") {
-              setNearDanger(true);
-              Speech.speak("Approaching Danger Zone");
-            } else {
-              setNearDanger(false);
-            }
-          } catch (err) {
-            console.log(err);
+  const predictAccident = async (lat, lng) => {
+    try {
+      const res = await dispatch(driverActions.warnDriver(username, lat, lng));
+      if (res.status === 1) {
+        //setNearDanger(true);
+        setNearDanger((state) => {
+          if (!state) {
+            warnUser(res.type);
+            return !state;
+          } else {
+            return state;
           }
-        }
-      );
-
-      return () => {
-        locationWatcher.remove();
-      };
+        });
+      } else if (res.status === -1) {
+        stopLocationWatcher();
+      } else if (res.status === 0) {
+        setNearDanger(false);
+        //setUserWarned(false);
+      }
+    } catch (err) {
+      console.log("DriverTrack predictAccident function error " + err);
     }
-  }, [startedTracking]);
+  };
+
+  const warnUser = (type) => {
+    if (type === "1") {
+      Speech.speak("Danger Message One");
+    } else if (type === "2") {
+      Speech.speak("Danger Message Two");
+    }
+
+    //setUserWarned(true);
+  };
+
+  const weatherRecheck = async (lat, lng) => {
+    try {
+      await dispatch(driverActions.recheckWeather(username, lat, lng));
+    } catch (err) {
+      console.log("DriverTrack recheckWeather function error " + err);
+    }
+  };
+
+  const startLocationWatcher = async () => {
+    const locationWatcher = await Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.Highest,
+        timeInterval: 100,
+        distanceInterval: 1,
+      },
+      (location) => {
+        // setUserLocation({
+        //   lat: location.coords.latitude,
+        //   lng: location.coords.longitude,
+        // });
+        setWeatherRecheckLocation((state) => {
+          const currentCoords = {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          };
+          if (!state) {
+            return currentCoords;
+          } else {
+            const distance = haversine(state, currentCoords, { unit: "km" });
+            if (distance > 1) {
+              weatherRecheck(currentCoords.latitude, currentCoords.longitude);
+              return currentCoords;
+            } else {
+              return state;
+            }
+          }
+        });
+        predictAccident(location.coords.latitude, location.coords.longitude);
+      }
+    );
+
+    setLocationWatcher(locationWatcher);
+  };
+
+  const stopLocationWatcher = async () => {
+    setLocationWatcher((state) => {
+      state.remove();
+      return null;
+    });
+    setEntrance(null);
+    //setUserLocation(null);
+    setNearDanger(false);
+    setIsTracking(false);
+    //setUserWarned(false);
+    try {
+      await dispatch(driverActions.endSession(username));
+    } catch (err) {
+      console.log("stopLocationWatcher error " + err);
+    }
+  };
 
   const verifyPermissions = async () => {
     const getStatus = await Permissions.getAsync(Permissions.LOCATION);
@@ -94,6 +169,9 @@ const DriverTrack = (props) => {
       });
       const data = await dispatch(
         driverActions.getEntrance(
+          token,
+          username,
+          selectedVehicle,
           location.coords.latitude,
           location.coords.longitude
         )
@@ -105,8 +183,9 @@ const DriverTrack = (props) => {
         ]);
         return;
       } else {
-        setStartedTracking(true);
+        setIsTracking(true);
         setEntrance(data);
+        startLocationWatcher();
       }
     } catch (err) {
       console.log("DriverTrack Err: " + err);
@@ -116,22 +195,21 @@ const DriverTrack = (props) => {
   return (
     <View style={styles.centered}>
       <View style={styles.container}>
-        {nearDanger ? (
-          <Text style={styles.danger}>NEAR DANGER ZONE!</Text>
-        ) : (
-          <Text style={styles.text}>
-            {!startedTracking ? "Begin Tracking?" : "Started Tracking"}
-          </Text>
+        {nearDanger && <Text style={styles.danger}>NEAR DANGER ZONE!</Text>}
+        {isTracking && !nearDanger && (
+          <Text style={styles.text}>Started Tracking</Text>
         )}
+        {!isTracking && <Text style={styles.text}>Begin Tracking</Text>}
       </View>
       <View style={styles.container}>
         <Button title="Begin" onPress={beginTracking} color="green" />
       </View>
-      {entrance ? (
+      {entrance && (
         <View style={styles.container}>
           <Text style={styles.text}>Entered at {entrance}</Text>
+          <Button title="STOP" color="red" onPress={stopLocationWatcher} />
         </View>
-      ) : null}
+      )}
     </View>
   );
 };

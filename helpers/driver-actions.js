@@ -96,7 +96,9 @@ export const login = (username, password, fromSignUp) => {
 
 export const logOut = (token) => {
   return async (dispatch) => {
-    const response = await fetch(`http://${ENV.localhost}:5000/driver/logout?token=${token}`);
+    const response = await fetch(
+      `http://${ENV.localhost}:5000/driver/logout?token=${token}`
+    );
 
     if (!response.ok) {
       throw new Error("Driver Actions log out Error");
@@ -138,7 +140,7 @@ export const verifySession = (token) => {
   };
 };
 
-export const getEntrance = (lat, lng) => {
+export const getEntrance = (token, username, regNo, lat, lng) => {
   return async (dispatch) => {
     const response = await fetch(
       `http://${ENV.localhost}:5000/epoints/nearEntrance`,
@@ -148,6 +150,9 @@ export const getEntrance = (lat, lng) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          token: token,
+          username: username,
+          regNo: regNo,
           lat: lat,
           lng: lng,
         }),
@@ -161,15 +166,15 @@ export const getEntrance = (lat, lng) => {
     const resData = await response.json();
     console.log(resData);
 
-    if (resData === "Not near any entrances") {
+    if (!resData.success) {
       return "INVALID";
     } else {
-      return resData;
+      return resData.message;
     }
   };
 };
 
-export const warnDriver = (lat, lng) => {
+export const warnDriver = (username, lat, lng) => {
   return async (dispatch) => {
     const response = await fetch(
       `http://${ENV.localhost}:5000/epoints/nearDanger`,
@@ -179,6 +184,7 @@ export const warnDriver = (lat, lng) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          username: username,
           lat: lat,
           lng: lng,
         }),
@@ -192,5 +198,61 @@ export const warnDriver = (lat, lng) => {
     const resData = await response.json();
 
     return resData;
+  };
+};
+
+export const recheckWeather = (username, lat, lng) => {
+  return async (dispatch) => {
+    const response = await fetch(
+      `http://${ENV.localhost}:5000/epoints/recheckWeather`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          lat: lat,
+          lng: lng,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("DriverActions recheckWeather error");
+    }
+
+    const resData = await response.json();
+    console.log(resData);
+  };
+};
+
+export const endSession = (username) => {
+  return async (dispatch) => {
+    const response = await fetch(
+      `http://${ENV.localhost}:5000/epoints/endSession`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("driver actions endSession function error");
+    }
+
+    const resData = await response.json();
+    console.log(resData);
+
+    if (!resData.success) {
+      throw new Error(resData.message);
+    } else {
+      console.log(resData.message);
+    }
   };
 };
