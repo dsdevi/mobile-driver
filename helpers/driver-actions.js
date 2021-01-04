@@ -196,6 +196,7 @@ export const warnDriver = (username, lat, lng) => {
     }
 
     const resData = await response.json();
+    console.log(resData);
 
     return resData;
   };

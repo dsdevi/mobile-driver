@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Alert, Button } from "react-native";
+import { Overlay } from "react-native-elements";
 import * as Permissions from "expo-permissions";
 import * as Speech from "expo-speech";
 import * as Location from "expo-location";
@@ -195,14 +196,18 @@ const DriverTrack = (props) => {
   return (
     <View style={styles.centered}>
       <View style={styles.container}>
-        {nearDanger && <Text style={styles.danger}>NEAR DANGER ZONE!</Text>}
+        {/* {nearDanger && <Text style={styles.danger}>NEAR DANGER ZONE!</Text>} */}
+        <Overlay isVisible={nearDanger} overlayStyle={styles.dangerContainer}>
+          <Text style={styles.danger}>NEAR DANGER ZONE!</Text>
+        </Overlay>
         {isTracking && !nearDanger && (
           <Text style={styles.text}>Started Tracking</Text>
         )}
-        {!isTracking && <Text style={styles.text}>Begin Tracking</Text>}
+        {!selectedVehicle && <Text style={styles.text}>Please select a vehicle</Text>}
+        {!isTracking && !!selectedVehicle && <Text style={styles.text}>Begin Tracking</Text>}
       </View>
       <View style={styles.container}>
-        <Button title="Begin" onPress={beginTracking} color="green" />
+        <Button title="Begin" onPress={beginTracking} color="green" disabled={!selectedVehicle} />
       </View>
       {entrance && (
         <View style={styles.container}>
@@ -229,10 +234,20 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 20,
+    fontFamily:"WorkSans_400Regular"
   },
   danger: {
     fontSize: 30,
     color: "red",
+    fontFamily:"WorkSans_700Bold"
+  },
+  dangerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical:'50%',
+    paddingHorizontal:10,
+    borderRadius: 10,
   },
 });
 
