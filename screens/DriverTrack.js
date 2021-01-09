@@ -137,7 +137,7 @@ const DriverTrack = (props) => {
     if (result.status !== "granted") {
       Alert.alert(
         "Insufficient permissions",
-        "You need to grant location permissions to take a picture",
+        "You need to grant location permissions to track",
         [{ text: "Okay" }]
       );
       return false;
