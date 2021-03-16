@@ -94,6 +94,33 @@ export const login = (username, password, fromSignUp) => {
   };
 };
 
+export const incidentSubmit = (details) => {
+  return async (dispatch) => {
+    const response = await fetch(
+      `http://${ENV.localhost}:5000/incident/submit`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(details),
+      }
+    );
+
+    if (!response.ok) {
+      console.log("eventSubmit response error");
+    }
+
+    const resData = await response.json();
+    console.log(resData);
+
+    if (!resData.success) {
+      console.log("eventSubmit resData error");
+      throw new Error(resData.message);
+    }
+  };
+};
+
 export const logOut = (token) => {
   return async (dispatch) => {
     const response = await fetch(

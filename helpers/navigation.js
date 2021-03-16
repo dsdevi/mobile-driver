@@ -14,6 +14,7 @@ import Colours from "../constants/colours";
 import VerifySession from "../components/VerifySession";
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import VehicleList from "../screens/VehicleList";
+import IncidentReport from "../screens/IncidentReport";
 
 const defaultNavOptions = {
   headerStyle: {
@@ -82,11 +83,25 @@ const TrackNav = createStackNavigator(
   }
 );
 
+const IncidentNav = createStackNavigator(
+  {
+    IncidentNav: IncidentReport,
+  },
+  {
+    defaultNavigationOptions: defaultNavOptions,
+    navigationOptions: {
+      tabBarLabel: "Reporting",
+      tabBarIcon: () => <Ionicons name="md-alert" size={30} />,
+    },
+  }
+);
+
 const AppNav = createBottomTabNavigator(
   {
     HomeNav: HomeNav,
     VehicleNav: VehicleNav,
     TrackNav: TrackNav,
+    IncidentNav: IncidentNav,
   },
   {
     defaultNavigationOptions: defaultNavOptions,
