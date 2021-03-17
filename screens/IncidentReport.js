@@ -385,7 +385,7 @@ const IncidentReport = (props) => {
           titleStyle={styles.submitText}
           onPress={() => {
             let details = {
-              incidentType:accidentSelect?"Accident":"Event",
+              isAccident:accidentSelect,
               kmPost:kmPost,
               suburb:suburb,
               sessionToken:token
