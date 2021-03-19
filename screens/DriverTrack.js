@@ -203,12 +203,33 @@ const DriverTrack = (props) => {
         {isTracking && !nearDanger && (
           <Text style={styles.text}>Started Tracking</Text>
         )}
-        {!selectedVehicle && <Text style={styles.text}>Please select a vehicle</Text>}
-        {!isTracking && !!selectedVehicle && <Text style={styles.text}>Begin Tracking</Text>}
+        {!selectedVehicle && (
+          <Text style={styles.text}>Please select a vehicle</Text>
+        )}
+        {!isTracking && !!selectedVehicle && (
+          <Text style={styles.text}>Begin Tracking</Text>
+        )}
       </View>
       <View style={styles.container}>
-        <Button title="Begin" onPress={beginTracking} color="green" disabled={!selectedVehicle} />
+        <Button
+          title="Begin"
+          onPress={beginTracking}
+          color="green"
+          disabled={!selectedVehicle}
+        />
       </View>
+      {!entrance && (
+        <View style={styles.warningContainer}>
+          <Text style={{ ...styles.text, textAlign: "justify" }}>
+            Predictions are made assuming{"\n"}
+            <Text style={styles.boldText}>
+              Your vehicle is in the best possible condition{"\n"}
+            </Text>
+            And you{"\n"}
+            <Text style={styles.boldText}>Keep a gap of 50m from other vehicles</Text>
+          </Text>
+        </View>
+      )}
       {entrance && (
         <View style={styles.container}>
           <Text style={styles.text}>Entered at {entrance}</Text>
@@ -232,21 +253,28 @@ const styles = StyleSheet.create({
   container: {
     margin: 10,
   },
+  warningContainer: {
+    margin: 10,
+    paddingHorizontal: 30,
+  },
   text: {
     fontSize: 20,
-    fontFamily:"WorkSans_400Regular"
+    fontFamily: "WorkSans_400Regular",
+  },
+  boldText: {
+    fontFamily: "WorkSans_600SemiBold",
   },
   danger: {
     fontSize: 30,
     color: "red",
-    fontFamily:"WorkSans_700Bold"
+    fontFamily: "WorkSans_700Bold",
   },
   dangerContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginVertical:'50%',
-    paddingHorizontal:10,
+    marginVertical: "50%",
+    paddingHorizontal: 10,
     borderRadius: 10,
   },
 });
